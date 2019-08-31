@@ -5,21 +5,63 @@
           <img src="../assets/logo_index.png" alt="">
         </div>
         <div class="card-bottom">
-            <el-form >
-              <el-input placeHolder='请输入手机号码' ></el-input>
-            </el-form>
-            <el-form style="margin-top: 20px" >
-                <el-input style="width: 240px;" placeHolder='请输入验证码' ></el-input>
+        <el-form ref='loginForm' :rules="loginRules" :model='loginForm' >
+            <el-form-item prop='mobile' >
+              <el-input v-model="loginForm.mobile" placeHolder='请输入手机号码' ></el-input>
+            </el-form-item>
+            <el-form-item style="margin-top: 20px" prop='code' >
+                <el-input v-model="loginForm.code" style="width: 240px;" placeHolder='请输入验证码' ></el-input>
                 <el-button style="float: right" >发送验证</el-button>
-              </el-form>
+              </el-form-item>
+              <el-form-item style='margin:20px 0' prop='check' >
+              <el-checkbox v-model="loginForm.check">我已阅读并同意用户协议和隐私条款</el-checkbox>
+              </el-form-item>
               <el-button class="card-btn" type="primary" plain>登录</el-button>
+              </el-form>
         </div>
     </div>
   </div>
     </template>
 <script>
 
-export default {}
+export default {
+  data () {
+    let fun = function (rule, value, callback) {
+      if (value) {
+        callback()
+      } else {
+        callback(new Error('不同意条款别想用'))
+      }
+    }
+    return {
+      loginForm: {
+        mobile: '',
+        code: '',
+        check: false
+      },
+      loginRules: {
+        check: [{
+          fun
+        }],
+        mobile: [{
+          required: true,
+          message: '手机号码不能为空'
+        }, {
+          pattern: /^1[3456789]\d{9}$/,
+          message: '手机格式不正确'
+        }],
+        code: [{
+          required: true,
+          message: '验证号码不能为空'
+        }, {
+          pattern: /^\d{6}$/,
+          message: '验证号码不正确'
+        }]
+      }
+
+    }
+  }
+}
 </script>
     <style>
       .login{
