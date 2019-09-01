@@ -16,7 +16,7 @@
               <el-form-item style='margin:20px 0' prop='check' >
               <el-checkbox v-model="loginForm.check">我已阅读并同意用户协议和隐私条款</el-checkbox>
               </el-form-item>
-              <el-button class="card-btn" type="primary" plain>登录</el-button>
+              <el-button @click='btn'  class="card-btn" type="primary" plain>登录</el-button>
               </el-form>
         </div>
     </div>
@@ -26,7 +26,7 @@
 
 export default {
   data () {
-    let fun = function (rule, value, callback) {
+    let validator = function (rule, value, callback) {
       if (value) {
         callback()
       } else {
@@ -41,7 +41,7 @@ export default {
       },
       loginRules: {
         check: [{
-          fun
+          validator
         }],
         mobile: [{
           required: true,
@@ -59,6 +59,27 @@ export default {
         }]
       }
 
+    }
+  },
+  methods: {
+    btn () {
+      this.$refs.loginForm.validate(isok => {
+        if (isok) {
+          this.$axios({
+            url: 'http://ttapi.research.itcast.cn/mp/v1_0/authorizations',
+            method: 'post',
+            data: this.loginForm
+          }).then(res => {
+            window.localStorage.setItem('user-token', res.data.data.token)
+            this.$router.push('/home')
+          }).catch(() => {
+            this.$message({
+              message: '手机号码错误',
+              type: 'warning'
+            })
+          })
+        }
+      })
     }
   }
 }
